@@ -43,7 +43,7 @@ def ttybotron( port = 17892 ):
             # hn = socket.gethostbyaddr( addr )
 
             # Now output any desired information
-            sys.stdout.write( "%15s\t%d %d %d %s" % (
+            sys.stdout.write( "(%s, %2d, %2d, %2d) %s" % (
                                 "", core, chip_x, chip_y, data
                             )
             )
