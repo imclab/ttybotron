@@ -40,10 +40,12 @@ def ttybotron( port = 50000 ):
             hn = socket.gethostbyaddr( addr )
 
             # Now output any desired information
-            sys.stdout.write( "\n" )
+            sys.stdout.write( "%15s\t% 2d % 2d % 2d\t%s" % (
+                                hn, core, chip_x, chip_y, data
+                            )
+            )
     finally:
         sock.close()
 
 if __name__ == "__main__":
-    raise NotImplementedError( "Not done yet!" )
     ttybotron( )
