@@ -19,18 +19,21 @@ def ttybotron( port = 50000 ):
     sock.bind( ( "", port ) )
 
     try:
-        while data, addr = sock.recvfrom( 1024 ):   # Socket size is 1024 bytes
+        while True:
+            # Grab the stuff from the socket
+            (data, addr) = sock.recvfrom( 1024 ) # Socket size is 1024 bytes
+
             # Unpack the data
             header = data[2:2+8]
             command = data[2+8:2+8+16]
-            data = [2+8+16:]
+            data = data[2+8+16:]
     
             # Unpack the header
-            (flags, iptag, dest_port, srce_port, dest_addr, srce_addr)
-                = struct.unpack( "!4B 2H", header )
+            (flags, iptag, dest_port, srce_port, dest_addr, srce_addr) = (
+                struct.unpack( "!4B 2H", header ) )
     
-            (chip_x, chip_y)
-                = struct.unpack( "2B", struct.pack( "H", srce_addr ) )
+            (chip_x, chip_y) = (
+                struct.unpack( "2B", struct.pack( "H", srce_addr ) ) )
     
             (cmdrc, arg1, arg2, arg3) = struct.unpack( "4I", command )
     
@@ -45,6 +48,7 @@ def ttybotron( port = 50000 ):
                             )
             )
     finally:
+        sys.stderr.write("\nEnd.")
         sock.close()
 
 if __name__ == "__main__":
