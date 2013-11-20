@@ -11,7 +11,7 @@ A TTY Tubotron.
 
 import socket, struct, sys
 
-def ttybotron( port = 50000 ):
+def ttybotron( port = 17892 ):
     """Continue to poll an incoming socket on the appropriate port and print
     out a formatted string of the machine, chip, core and message."""
     # Set up the socket
@@ -40,11 +40,11 @@ def ttybotron( port = 50000 ):
             core = srce_port & 0x1f
     
             # Reverse look up the DNS for the incoming SpiNNaker board
-            hn = socket.gethostbyaddr( addr )
+            # hn = socket.gethostbyaddr( addr )
 
             # Now output any desired information
             sys.stdout.write( "%15s\t% 2d % 2d % 2d\t%s" % (
-                                hn, core, chip_x, chip_y, data
+                                "", core, chip_x, chip_y, data
                             )
             )
     finally:
