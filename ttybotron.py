@@ -25,7 +25,6 @@ def ttybotron( port = 17892 ):
 
             # Unpack the data
             header = data[2:2+8]
-            command = data[2+8:2+8+16]
             data = data[2+8+4:]
     
             # Unpack the header
@@ -34,8 +33,6 @@ def ttybotron( port = 17892 ):
     
             (chip_x, chip_y) = (
                 struct.unpack( "2B", struct.pack( "H", srce_addr ) ) )
-    
-            (cmdrc, arg1, arg2, arg3) = struct.unpack( "4I", command )
     
             core = srce_port & 0x1f
     
