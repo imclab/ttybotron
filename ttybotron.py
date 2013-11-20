@@ -26,7 +26,7 @@ def ttybotron( port = 17892 ):
             # Unpack the data
             header = data[2:2+8]
             command = data[2+8:2+8+16]
-            data = data[2+8+16:]
+            data = data[2+8+4:]
     
             # Unpack the header
             (flags, iptag, dest_port, srce_port, dest_addr, srce_addr) = (
