@@ -49,7 +49,6 @@ def ttybotron( port = 17892 ):
         pass
     finally:
         sys.stdout.flush()
-        sys.stderr.write("\nEnd.")
         sock.close()
 
 if __name__ == "__main__":
