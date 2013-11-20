@@ -47,6 +47,8 @@ def ttybotron( port = 17892 ):
                                 "", core, chip_x, chip_y, data
                             )
             )
+    except KeyboardInterrupt:
+        pass
     finally:
         sys.stderr.write("\nEnd.")
         sock.close()
