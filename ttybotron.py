@@ -95,7 +95,7 @@ def ttybotron( args = None ):
         h_fields = []
 
         if not args.no_host:
-            h_fields.append( "%12s" % "Host" )
+            h_fields.append( str.ljust( "Host", 12 ) )
         if not args.no_chip:
             h_fields.append( " X" )
             h_fields.append( " Y" )
