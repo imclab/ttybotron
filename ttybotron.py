@@ -30,29 +30,15 @@ class SDPPrintPacket( object ):
     """
     def __init__( self, data ):
         # Process the data and save
-        header = data[2:2+8]
+        header = data[0:2+8]
         self.data = data[2+8+4:]
 
-        # Unpack the header
-        (flags, iptag, dest_port, srce_port, dest_addr, srce_addr) = (
-            struct.unpack( "!4B 2H", header ) )
+        ( self.flags, self.iptag, self.dest_port, self.srce_port,
+          self.dest_addr, self.chip_x, self.chip_y ) = ( 
+          struct.unpack( "!2x 4B H 2B", header )
+        )
    
-        (chip_x, chip_y) = (
-            struct.unpack( "2B", struct.pack( "H", srce_addr ) ) )
-  
-        core = srce_port & 0x1f
-
-        # Save all this data
-        self.flags = flags
-        self.iptag = iptag
-        self.dest_port = dest_port
-        self.srce_port = srce_port
-        self.dest_addr = dest_addr
-        self.srce_addr = srce_addr
-
-        self.chip_x = chip_x
-        self.chip_y = chip_y
-        self.core = core
+        self.core = self.srce_port & 0x1f
 
 class SDPPrintReceiver( threading.Thread ):
     """Creates a thread which keeps trying to receive SDP messages.  When a 
@@ -77,11 +63,11 @@ class SDPPrintReceiver( threading.Thread ):
         while not self.exit:
             # Try to receive a packet
             try:
-                data = self._socket.recv( 1024 )
+                ( data, addr ) = self._socket.recvfrom( 1024 )
 
                 # Call the callback with the packet
                 packet = SDPPrintPacket( data )
-                self._callback( packet )
+                self._callback( packet, addr )
             except IOError: # There was nothing to get
                 pass
             finally:
@@ -95,14 +81,14 @@ def ttybotron( args = None ):
         h_fields = []
 
         if not args.no_host:
-            h_fields.append( str.ljust( "Host", 12 ) )
+            h_fields.append( str.ljust( "Host", 15 ) )
         if not args.no_chip:
             h_fields.append( " X" )
             h_fields.append( " Y" )
         if not args.no_core:
             h_fields.append( " C" )
 
-        sys.stdout.write( "#( %s) Message\n" % string.join( h_fields, ", " ) )
+        sys.stdout.write( "# %s  Message\n" % string.join( h_fields, ", " ) )
         sys.stdout.flush()
 
     # Set up the socket
@@ -111,11 +97,13 @@ def ttybotron( args = None ):
     sock = make_socket( args.port )
 
     # Create a call back function
-    def printer( packet ):
+    def printer( packet, addr ):
         """Prints an SDP Packet."""
         h_fields = []
         if not args.no_host:
-            h_fields.append( str.ljust( "", 15 ) )
+            ( ip, port ) = addr
+            ( host, aliases, ips ) = socket.gethostbyaddr( ip )
+            h_fields.append( str.ljust( host, 15 )[0:15] )
         if not args.no_chip:
             h_fields.append( "%2d" % packet.chip_x )
             h_fields.append( "%2d" % packet.chip_y )
