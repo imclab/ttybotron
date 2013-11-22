@@ -31,7 +31,7 @@ class SDPPrintPacket( object ):
     def __init__( self, data ):
         # Process the data and save
         header = data[2:2+8]
-        data = data[2+8+4:]
+        self.data = data[2+8+4:]
 
         # Unpack the header
         (flags, iptag, dest_port, srce_port, dest_addr, srce_addr) = (
