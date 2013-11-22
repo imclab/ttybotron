@@ -106,6 +106,8 @@ def ttybotron( args = None ):
         sys.stdout.flush()
 
     # Set up the socket
+    if args.verbose:
+        sys.stderr.write( ".. Creating socket\n" )
     sock = make_socket( args.port )
 
     # Create a call back function
@@ -113,14 +115,14 @@ def ttybotron( args = None ):
         """Prints an SDP Packet."""
         h_fields = []
         if not args.no_host:
-            h_fields.append( "%12s" % "" )
+            h_fields.append( str.ljust( "", 15 ) )
         if not args.no_chip:
             h_fields.append( "%2d" % packet.chip_x )
             h_fields.append( "%2d" % packet.chip_y )
         if not args.no_core:
             h_fields.append( "%2d" % packet.core )
 
-        sys.stdout.write( "(%s) %s\n" % (
+        sys.stdout.write( "( %s) %s\n" % (
                             string.join( h_fields, ", " ),
                             packet.data
                         )
@@ -129,19 +131,25 @@ def ttybotron( args = None ):
 
     try:
         # Make and run the socket receiving thread
+        if args.verbose: sys.stderr.write( ".. Starting receiver thread\n" )
         recvr = SDPPrintReceiver( sock, printer )
         recvr.start()
+
+        if args.verbose: sys.stderr.write( ".. Waiting for packets...\n" )
 
         while True:
             pass
     except KeyboardInterrupt:
         recvr.exit = True
+        if args.verbose: sys.stderr.write( ".. Terminating receiver thread\n" )
     finally:
         # Wait for the receiver, close the socket
         recvr.join()
+        if args.verbose: sys.stderr.write( ".. Closing socket\n" )
         sock.close()
 
         # Flush outputs
+        if args.verbose: sys.stderr.write( ".. Flushing output" )
         sys.stdout.flush()
         sys.stderr.write("\n")
         sys.stderr.flush()
@@ -150,6 +158,8 @@ if __name__ == "__main__":
     # Create an argument parser
     parser = argparse.ArgumentParser( description='Display printf output '\
                                       'from SpiNNaker machines.' )
+    parser.add_argument( "-v", "--verbose", help="display verbose status",
+                         action="store_true" )
     parser.add_argument( "-p", "--port", help="listen on the given port",
                          default=17892, type=int )
     igroup = parser.add_mutually_exclusive_group()
