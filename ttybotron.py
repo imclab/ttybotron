@@ -4,7 +4,6 @@ TTYBOTRON
 A TTY Tubotron.
 
 .. todo::
-   * find host name
    * curses interface
 """
 
@@ -77,16 +76,13 @@ def ttybotron( args = None ):
     """Continue to poll an incoming socket on the appropriate port and print
     out a formatted string of the machine, chip, core and message."""
     # Retrieve some options from args, construct output strings
-    if args.headers:
-        h_fields = []
+    field_bs = [not x for x in
+                   [args.no_host, args.no_chip, args.no_chip, args.no_core]
+               ]
 
-        if not args.no_host:
-            h_fields.append( str.ljust( "Host", 15 ) )
-        if not args.no_chip:
-            h_fields.append( " X" )
-            h_fields.append( " Y" )
-        if not args.no_core:
-            h_fields.append( " C" )
+    if args.headers:
+        hs = [ str.ljust( "Host", 15 ), " X", " Y", " C" ]
+        h_fields = [h for (h,b) in zip(hs, field_bs) if b]
 
         sys.stdout.write( "# %s  Message\n" % string.join( h_fields, ", " ) )
         sys.stdout.flush()
@@ -99,16 +95,12 @@ def ttybotron( args = None ):
     # Create a call back function
     def printer( packet, addr ):
         """Prints an SDP Packet."""
-        h_fields = []
-        if not args.no_host:
-            ( ip, port ) = addr
-            ( host, aliases, ips ) = socket.gethostbyaddr( ip )
-            h_fields.append( str.ljust( host, 15 )[0:15] )
-        if not args.no_chip:
-            h_fields.append( "%2d" % packet.chip_x )
-            h_fields.append( "%2d" % packet.chip_y )
-        if not args.no_core:
-            h_fields.append( "%2d" % packet.core )
+        ( ip, port ) = addr
+        ( host, aliases, ips ) = socket.gethostbyaddr( ip )
+
+        hs = [ str.ljust( host, 15 )[:15], "%2d" % packet.chip_x,
+               "%2d" % packet.chip_y, "%2d" % packet.core ]
+        h_fields = [h for (h,b) in zip(hs, field_bs) if b]
 
         sys.stdout.write( "( %s) %s\n" % (
                             string.join( h_fields, ", " ),
