@@ -4,12 +4,11 @@ TTYBOTRON
 A TTY Tubotron.
 
 .. todo::
- * Command line args for:
-   * Port to listen on
-   * Filtering by IP, chip, core, etc.
+   * find host name
+   * curses interface
 """
 
-import socket, struct, sys, threading, time
+import argparse, socket, string, struct, sys, threading, time
 
 def make_socket( port ):
     """Make an appropriate socket for receiving SDP packets.
@@ -88,26 +87,47 @@ class SDPPrintReceiver( threading.Thread ):
             finally:
                 time.sleep( 0.1 )
 
-def ttybotron( port = 17892 ):
+def ttybotron( args = None ):
     """Continue to poll an incoming socket on the appropriate port and print
     out a formatted string of the machine, chip, core and message."""
+    # Retrieve some options from args, construct output strings
+    if args.headers:
+        h_fields = []
+
+        if not args.no_host:
+            h_fields.append( "%12s" % "Host" )
+        if not args.no_chip:
+            h_fields.append( " X" )
+            h_fields.append( " Y" )
+        if not args.no_core:
+            h_fields.append( " C" )
+
+        sys.stdout.write( "#( %s) Message\n" % string.join( h_fields, ", " ) )
+        sys.stdout.flush()
+
     # Set up the socket
-    sock = make_socket( port )
+    sock = make_socket( args.port )
+
+    # Create a call back function
+    def printer( packet ):
+        """Prints an SDP Packet."""
+        h_fields = []
+        if not args.no_host:
+            h_fields.append( "%12s" % "" )
+        if not args.no_chip:
+            h_fields.append( "%2d" % packet.chip_x )
+            h_fields.append( "%2d" % packet.chip_y )
+        if not args.no_core:
+            h_fields.append( "%2d" % packet.core )
+
+        sys.stdout.write( "(%s) %s\n" % (
+                            string.join( h_fields, ", " ),
+                            packet.data
+                        )
+        )
+        sys.stdout.flush()
 
     try:
-        # Create a call back function
-        def printer( packet ):
-            """Prints an SDP Packet."""
-            sys.stdout.write( "(%s, %2d, %2d, %2d) %s" % (
-                                "",
-                                packet.chip_x,
-                                packet.chip_y,
-                                packet.core,
-                                packet.data
-                            )
-            )
-            sys.stdout.flush()
-
         # Make and run the socket receiving thread
         recvr = SDPPrintReceiver( sock, printer )
         recvr.start()
@@ -127,4 +147,27 @@ def ttybotron( port = 17892 ):
         sys.stderr.flush()
 
 if __name__ == "__main__":
-    ttybotron( )
+    # Create an argument parser
+    parser = argparse.ArgumentParser( description='Display printf output '\
+                                      'from SpiNNaker machines.' )
+    parser.add_argument( "-p", "--port", help="listen on the given port",
+                         default=17892, type=int )
+    igroup = parser.add_mutually_exclusive_group()
+    igroup.add_argument( "-i", "--interactive", help="run an interactive " \
+                          "instance using curses", action="store_true" )
+    parser.add_argument( "-t", "--headers", help="print the table header",
+                         action="store_true" )
+    parser.add_argument( "--no-host", help="don't display the host field",
+                         action="store_true" )
+    parser.add_argument( "--no-chip", help="don't display the chip x or y",
+                         action="store_true" )
+    parser.add_argument( "--no-core", help="don't display the core field",
+                         action="store_true" )
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    if args.interactive:
+        raise NotImplementedError
+    else:
+        ttybotron( args = args )
