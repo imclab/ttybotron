@@ -96,7 +96,10 @@ def ttybotron( args = None ):
     def printer( packet, addr ):
         """Prints an SDP Packet."""
         ( ip, port ) = addr
-        ( host, aliases, ips ) = socket.gethostbyaddr( ip )
+        if not args.no_dns:
+            ( host, aliases, ips ) = socket.gethostbyaddr( ip )
+        else:
+            host = "%15s" % ip
 
         hs = [ str.ljust( host, 15 )[:15], "%2d" % packet.chip_x,
                "%2d" % packet.chip_y, "%2d" % packet.core ]
@@ -152,6 +155,9 @@ if __name__ == "__main__":
     parser.add_argument( "--no-chip", help="don't display the chip x or y",
                          action="store_true" )
     parser.add_argument( "--no-core", help="don't display the core field",
+                         action="store_true" )
+    parser.add_argument( "--no-dns", "--nd", help="don't use DNS loop up " \
+                         "for the hostname, just print the IP address",
                          action="store_true" )
 
     # Parse the arguments
