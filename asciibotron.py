@@ -1,5 +1,16 @@
 import ttybotron, urwid
 
+class AsbListBoxWalker( object ):
+    pass
+
+class AsbListBox( urwid.ListBox ):
+    def __init__( self ):
+        body = urwid.SimpleFocusListWalker([])
+        super( AsbListBox, self ).__init__( body )
+
+    def add_message( self, packet, addr ):
+        # Get the current position
+
 class Asciibotron( object ):
     def __init__( self ):
         # Generate UI elements
@@ -23,10 +34,6 @@ class Asciibotron( object ):
         )
         self.recvr.start( )
         self.loop.run( )
-
-    def receive( self, packet, addr ):
-        """Receive a new message."""
-        pass
 
     def unhandled( self, input ):
         if input in ['q', 'Q']:
