@@ -6,30 +6,29 @@ except:
     sys.stderr.write( "Failed to import urwid, you must install urwid.\n" )
     sys.exit( -1 )
 
-class AsbListBoxWalker( object ):
-    pass
-
-class AsbListBox( urwid.ListBox ):
-    def __init__( self ):
-        body = urwid.SimpleFocusListWalker([])
-        super( AsbListBox, self ).__init__( body )
-
-    def add_message( self, packet, addr ):
+class AsbListBoxItem( urwid.WidgetWrap ):
+    def __init__( self, packet, addr ):
         lbl_host = ""
-        lbl_x = urwid.Text( "%d" % packet.chip_x, align="right" )
-        lbl_y = urwid.Text( "%d" % packet.chip_y, align="right" )
-        lbl_c = urwid.Text( "%d" % packet.core, align="right" )
-        lbl_message = urwid.Text( packet.data )
+        lbl_x = urwid.Text( u"%d" % packet.chip_x, align="right" )
+        lbl_y = urwid.Text( u"%d" % packet.chip_y, align="right" )
+        lbl_c = urwid.Text( u"%d" % packet.core, align="right" )
+        lbl_message = urwid.Text( u"%s" % packet.data )
 
-        clms = urwid.Columns([
-            (10, lbl_host),
-            ( 3, lbl_x),
-            ( 3, lbl_y),
-            ( 3, lbl_c),
-            lbl_message
-        ])
+        #clms = urwid.Columns([
+            #(10, lbl_host),
+            #( 3, lbl_x),
+            #( 3, lbl_y),
+            #( 3, lbl_c),
+            #lbl_message
+        #])
 
-        self.append( clms )
+        self.__super.__init__(lbl_message)
+
+    def selectable( self ):
+        return True
+    
+    def keypress( self, size, key ):
+        return key
 
 class Asciibotron( object ):
     def __init__( self ):
@@ -56,7 +55,7 @@ class Asciibotron( object ):
         map1 = urwid.AttrMap( self.wdg_cols_top, 'header' )
 
         # List box
-        self.wdg_list_msg = AsbListBox()
+        self.wdg_list_msg = urwid.ListBox([])
 
         # Frame
         self.wdg_frame = urwid.Frame(
@@ -67,7 +66,7 @@ class Asciibotron( object ):
         ## Set up the message listening
         self.socket = ttybotron.make_socket( 17892 )
         self.recvr = ttybotron.SDPPrintReceiver( self.socket,
-            self.wdg_list_msg.add_message )
+            lambda a, p : self.wdg_list_msg.contents().append( AsbListBoxItem( a, p ) ) )
         self.messages = []
     
     def __call__( self ):
