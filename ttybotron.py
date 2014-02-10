@@ -1,10 +1,9 @@
+#!/usr/bin/env python
+
 """
 TTYBOTRON
 =========
 A TTY Tubotron.
-
-.. todo::
-   * curses interface
 """
 
 import argparse, socket, string, struct, sys, threading, time
