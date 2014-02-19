@@ -69,7 +69,7 @@ class SDPPrintReceiver( threading.Thread ):
             except IOError: # There was nothing to get
                 pass
             finally:
-                time.sleep( 0.1 )
+                time.sleep( 0.0001 )
 
 def ttybotron( args = None ):
     """Continue to poll an incoming socket on the appropriate port and print
