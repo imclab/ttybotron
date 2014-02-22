@@ -15,10 +15,10 @@ Option(s)                         | Effect
  ```-p PORT```, ```--port PORT``` | listen on the given port
  ```-i```, ```--interactive```    | run an interactive instance using curses
  ```-t```, ```--headers```        | print the table header
- ```--no-host```                  | don't display the host field
- ```--no-chip```                  | don't display the chip x or y
- ```--no-core```                  | don't display the core field
- ```--no-dns```, ```--nd```       | don't use DNS loop up for the hostname, just print the IP address
+ ```--no-host```, ```-nh```       | don't display the host field
+ ```--no-chip```, ```-nxy```      | don't display the chip x or y
+ ```--no-core```, ```-nc```, ```-np``` | don't display the core field
+ ```--no-dns```, ```--nd```       | don't use DNS look up for the hostname, just print the IP address
 
 Installation
 ------------

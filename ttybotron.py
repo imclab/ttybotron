@@ -138,24 +138,27 @@ def ttybotron( args = None ):
 
 if __name__ == "__main__":
     # Create an argument parser
-    parser = argparse.ArgumentParser( description='Display printf output '\
+    parser = argparse.ArgumentParser( description='Display printf output '
                                       'from SpiNNaker machines.' )
     parser.add_argument( "-v", "--verbose", help="display verbose status",
                          action="store_true" )
     parser.add_argument( "-p", "--port", help="listen on the given port",
                          default=17892, type=int )
     igroup = parser.add_mutually_exclusive_group()
-    igroup.add_argument( "-i", "--interactive", help="run an interactive " \
+    igroup.add_argument( "-i", "--interactive", help="run an interactive "
                           "instance using curses", action="store_true" )
     parser.add_argument( "-t", "--headers", help="print the table header",
                          action="store_true" )
-    parser.add_argument( "--no-host", help="don't display the host field",
+    parser.add_argument( "--no-host", "-nh",
+                         help="don't display the host field",
                          action="store_true" )
-    parser.add_argument( "--no-chip", help="don't display the chip x or y",
+    parser.add_argument( "--no-chip", "-nxy",
+                         help="don't display the chip x or y",
                          action="store_true" )
-    parser.add_argument( "--no-core", help="don't display the core field",
+    parser.add_argument( "--no-core", "-np", "-nc",
+                         help="don't display the core field",
                          action="store_true" )
-    parser.add_argument( "--no-dns", "--nd", help="don't use DNS loop up " \
+    parser.add_argument( "--no-dns", "--nd", help="don't use DNS look up "
                          "for the hostname, just print the IP address",
                          action="store_true" )
 
