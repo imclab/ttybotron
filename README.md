@@ -20,10 +20,26 @@ Option(s)                         | Effect
  ```--no-core```                  | don't display the core field
  ```--no-dns```, --nd             | don't use DNS loop up for the hostname, just print the IP address
 
+Installation
+------------
+
+You can install ttybotron by running the following as root:
+
+```bash
+# python setup.py install
+```
+
+ttybotron can then be run by any user with the command:
+
+```bash
+$ ttybotron.py
+```
+
+
 Troubleshooting
 ---------------
 
 If you think you should be receiving packets and aren't you should:
 
-1. Run ttybotron with the ```--no-dns``` option: ```ttybotron --nd```
+1. Run ttybotron with the ```--no-dns``` option: ```ttybotron.py --nd```
 2. Check that your firewall is accepting UDP packets on port 17892
